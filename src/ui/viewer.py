@@ -6,7 +6,7 @@ class Viewer:
     def __init__(self, root):
         self.root = root
         root.geometry("1200x600")
-        root.title("Inteligência Artificial - Simulador de Desastres")
+        root.title("Inteligência Artificial - Simulador")
 
         self.canvas = GraphCanvas(root, width=1200, height=600, bg="white")
         self.canvas.pack()

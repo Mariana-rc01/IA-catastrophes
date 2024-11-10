@@ -2,7 +2,7 @@
 
 ## ⚒️ TODO _(até 15/11/2025)_
 
-- [ ] Gerar grafo e visualização. - Lobo
+- [x] Gerar grafo e visualização. - Lobo
 - [ ] Distribuição de mantimentos para veículos. - Mário
 - [ ] BFS. - Mariana
 - [ ] DFS. - Rita

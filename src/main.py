@@ -20,10 +20,13 @@ def main():
     geography = dataset['geography']
     graph = load_map_data_to_graph(geography)
 
+    # TODO: Load extra data from dataset
+    state = State(0, [], None, [], graph)
+
     ## Load main window
     root = tk.Tk()
     app = Viewer(root)
-    app.display_graph(graph)
+    app.display_graph(state.graph)
     app.run()
 
 if __name__ == '__main__':
