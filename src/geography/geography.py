@@ -1,0 +1,19 @@
+from graph.graph import Graph
+from graph.position import Position
+import osmnx as ox
+
+def load_map_data_to_graph(geography):
+    G = ox.graph_from_place(geography, network_type="drive")
+
+    graph = Graph()
+
+    for node, data in G.nodes(data=True):
+        position = Position(data['x'], data['y'])
+        graph.add_node(position)
+
+    for u, v in G.edges():
+        pos1 = Position(G.nodes[u]['x'], G.nodes[u]['y'])
+        pos2 = Position(G.nodes[v]['x'], G.nodes[v]['y'])
+        graph.add_edge(pos1, pos2)
+
+    return graph
