@@ -3,6 +3,7 @@ from ui.viewer import Viewer
 import tkinter as tk
 import json
 
+
 class State:
     def __init__(self, time, vehicles, start_point, end_points, graph):
         self.time = time
@@ -31,3 +32,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+

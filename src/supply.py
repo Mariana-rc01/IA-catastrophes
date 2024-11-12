@@ -1,3 +1,5 @@
+from enum import Enum
+
 class SupplyType(Enum):
     Water = 0,
     Food = 1,
@@ -14,4 +16,4 @@ def get_weight_volume_per_supply(supply_type):
 class Supply:
     def __init__(self, quantity, type):
         self.quantity = quantity
-        self.type = type
+        self.type = type    
