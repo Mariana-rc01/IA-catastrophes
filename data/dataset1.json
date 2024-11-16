@@ -1,4 +1,38 @@
 {
     "name": "dataset1",
-    "geography": "Gualtar, Braga, Portugal"
+    "geography": "Gualtar, Braga, Portugal",
+    "vehicles": [
+        {
+            "id": 1,
+            "position": [-8.3969801, 41.5588274],
+            "type": {
+                "name": "Camião",
+                "transportation": "LAND",
+                "fuel_capacity": 100,
+                "weight_capacity": 100,
+                "volume_capacity": 100,
+                "average_velocity": 60
+            },
+            "current_fuel": 100,
+            "current_weight": 0,
+            "current_volume": 0,
+            "status": "IDLE"
+        }
+    ],
+    "start_point": {
+        "position": [-8.3969801, 41.5588274],
+        "supplies": [
+            {"quantity": 10, "type": "Water"},
+            {"quantity": 5, "type": "Food"}
+        ]
+    },
+    "end_points": [
+        {
+            "position": [-8.3798922, 41.5684793],
+            "needsSupplies": {
+                "Water": 7,
+                "Food": 4
+            }
+        }
+    ]
 }
