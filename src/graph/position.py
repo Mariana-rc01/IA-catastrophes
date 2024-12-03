@@ -5,7 +5,7 @@ class Position:
 
     def __str__(self):
         return f"({self.x}, {self.y})"
-    
+
     def __hash__(self):
         return hash((self.x, self.y))
 
@@ -18,4 +18,3 @@ class Position:
         if isinstance(other, Position):
             return (self.x, self.y) < (other.x, other.y)
         return False
- 
