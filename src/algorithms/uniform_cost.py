@@ -4,7 +4,7 @@ import vehicle as vh
 import supply as sp
 from graph.node import Node
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
-
+from algorithms.manhattan_distance import manhattan_distance
 
 def ucs_supply_delivery(state, start_point, end_point):
     def get_supplies_to_send(needed_supplies, available_supplies):
@@ -131,12 +131,3 @@ def ucs_supply_delivery(state, start_point, end_point):
                     )
 
     return None, 0, "No path found."
-
-
-def manhattan_distance(p1, p2):
-    if isinstance(p1, Node):
-        p1 = p1.position
-    if isinstance(p2, Node):
-        p2 = p2.position
-
-    return abs(p1.x - p2.x) + abs(p1.y - p2.y)

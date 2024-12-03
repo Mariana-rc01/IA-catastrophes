@@ -2,6 +2,7 @@ from collections import deque
 from supply import SupplyType, Supply
 from vehicle import VehicleStatus
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
+from algorithms.manhattan_distance import manhattan_distance
 
 def bfs_supply_delivery(state, start_point, end_point):
 
@@ -71,6 +72,3 @@ def bfs_supply_delivery(state, start_point, end_point):
                     queue.append((neighbor.position, path + [neighbor.position], new_distance))
 
     return None, 0, "No path found."
-
-def manhattan_distance(p1, p2):
-    return abs(p1.x - p2.x) + abs(p1.y - p2.y)
