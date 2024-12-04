@@ -1,7 +1,7 @@
 from queue import PriorityQueue
 
-from algorithms.heuristic import manhattan_distance
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
+from algorithms.utils import manhattan_distance
 from supply import Supply, SupplyType
 from vehicle import VehicleStatus
 
@@ -61,7 +61,7 @@ def a_star_supply_delivery(state, start_point, end_point, heuristic):
             else:
                 return None, 0, print("There aren't any available vehicles.")
 
-            return ([str(position) for position in path + [end_point.position]], total_distance,
+            return ([str(position) for position in path], total_distance,
                 {vehicle.id: [s.type.name for s in supplies] for vehicle, supplies in zip(vehicles, supplies_per_vehicle)})
 
         current_node = state.graph.nodes.get(current_position)

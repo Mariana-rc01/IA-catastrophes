@@ -1,9 +1,6 @@
+from algorithms.utils import manhattan_distance
 from supply import SupplyType, get_weight_volume_per_supply
 from vehicle import VehicleStatus
-
-# Utility function to calculate Manhattan distance between two points
-def manhattan_distance(p1, p2):
-    return abs(p1.x - p2.x) + abs(p1.y - p2.y)
 
 # Heuristic based on Manhattan distance
 def manhattan_heuristic(p1, p2, state, end_point):

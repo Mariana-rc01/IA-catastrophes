@@ -1,12 +1,9 @@
-from collections import deque
-from algorithms.heuristic import manhattan_distance
-from supply import SupplyType, Supply
+from queue import PriorityQueue
+from supply import Supply, SupplyType
 from vehicle import VehicleStatus
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
-from algorithms.manhattan_distance import manhattan_distance
 
-def bfs_supply_delivery(state, start_point, end_point):
-
+def greedy_supply_delivery(state, start_point, end_point, heuristic):
     # Check needed supplies
     needed_supplies = end_point.supplies_needed
     available_supplies = start_point.supplies
@@ -23,28 +20,27 @@ def bfs_supply_delivery(state, start_point, end_point):
             supplies_to_send.append(Supply(total_available, SupplyType[needed_type]))
             supplies_consumed[SupplyType[needed_type]] = total_available
 
-    # BFS
+    # Greedy Algorithm
     visited = set()
-    queue = deque([(start_point.position, [], 0)])
+    pq = PriorityQueue()
+    pq.put((0, start_point.position, []))  # (heuristic, current_position, path)
 
-    while queue:
-        current_position, path, total_distance = queue.popleft()
+    while not pq.empty():
+        priority, current_position, path = pq.get()
 
         if current_position in visited:
             continue
-
         visited.add(current_position)
 
         if current_position == end_point.position:
-            #split supplies per vehicle
-            vehicles = [v for v in state.vehicles if v.position == start_point.position and v.vehicle_status == VehicleStatus.IDLE and v.current_fuel >= total_distance]
+            # Assign supplies to vehicles
+            vehicles = [v for v in state.vehicles if v.position == start_point.position and v.vehicle_status == VehicleStatus.IDLE]
             supplies_per_vehicle = split_supplies_per_vehicle(vehicles, supplies_to_send)
-            
+
             for vehicle, supplies in zip(vehicles, supplies_per_vehicle):
                 if supplies:
                     vehicle.position = end_point.position
                     vehicle.vehicle_status = VehicleStatus.BUSY
-                    vehicle.current_fuel -= total_distance
 
             if supplies_per_vehicle:
                 for supply_type, quantity_used in supplies_consumed.items():
@@ -60,16 +56,16 @@ def bfs_supply_delivery(state, start_point, end_point):
                                     end_point.satisfy_supplies([Supply(supply.quantity, supply_type)])
                                     supply.quantity = 0
             else:
-                return None, 0, print("There aren't any available vehicles.")
+                return None, 0, "There aren't any available vehicles."
 
-            return ([str(position) for position in path + [end_point.position]], total_distance,
+            return ([str(position) for position in path], len(path),
                 {vehicle.id: [s.type.name for s in supplies] for vehicle, supplies in zip(vehicles, supplies_per_vehicle)})
 
         current_node = state.graph.nodes.get(current_position)
         if current_node:
             for neighbor, is_open in current_node.neighbours:
                 if is_open and neighbor.position not in visited:
-                    new_distance = total_distance + manhattan_distance(current_position, neighbor.position)
-                    queue.append((neighbor.position, path + [neighbor.position], new_distance))
+                    heuristic_cost = heuristic(neighbor.position, end_point.position, state, end_point)
+                    pq.put((heuristic_cost, neighbor.position, path + [neighbor.position]))
 
     return None, 0, "No path found."

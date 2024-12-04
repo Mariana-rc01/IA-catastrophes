@@ -4,7 +4,7 @@ import vehicle as vh
 import supply as sp
 from graph.node import Node
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
-from algorithms.manhattan_distance import manhattan_distance
+from algorithms.utils import manhattan_distance
 
 def ucs_supply_delivery(state, start_point, end_point):
     def get_supplies_to_send(needed_supplies, available_supplies):
@@ -106,7 +106,7 @@ def ucs_supply_delivery(state, start_point, end_point):
                 return result
 
             return (
-                [str(position) for position in path + [end_point.position]],
+                [str(position) for position in path],
                 total_distance,
                 {
                     vehicle.id: [s.type.name for s in supplies]
