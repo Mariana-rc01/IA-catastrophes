@@ -1,12 +1,11 @@
-from collections import deque
+from queue import PriorityQueue
+
 from algorithms.heuristic import manhattan_distance
-from supply import SupplyType, Supply
-from vehicle import VehicleStatus
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
-from algorithms.manhattan_distance import manhattan_distance
+from supply import Supply, SupplyType
+from vehicle import VehicleStatus
 
-def bfs_supply_delivery(state, start_point, end_point):
-
+def a_star_supply_delivery(state, start_point, end_point, heuristic):
     # Check needed supplies
     needed_supplies = end_point.supplies_needed
     available_supplies = start_point.supplies
@@ -23,20 +22,20 @@ def bfs_supply_delivery(state, start_point, end_point):
             supplies_to_send.append(Supply(total_available, SupplyType[needed_type]))
             supplies_consumed[SupplyType[needed_type]] = total_available
 
-    # BFS
+    # A* Algorithm
     visited = set()
-    queue = deque([(start_point.position, [], 0)])
+    pq = PriorityQueue()
+    pq.put((0, start_point.position, [], 0))  # (priority, current_position, path, total_distance)
 
-    while queue:
-        current_position, path, total_distance = queue.popleft()
+    while not pq.empty():
+        priority, current_position, path, total_distance = pq.get()
 
         if current_position in visited:
             continue
-
         visited.add(current_position)
 
         if current_position == end_point.position:
-            #split supplies per vehicle
+            # Assign supplies to vehicles
             vehicles = [v for v in state.vehicles if v.position == start_point.position and v.vehicle_status == VehicleStatus.IDLE and v.current_fuel >= total_distance]
             supplies_per_vehicle = split_supplies_per_vehicle(vehicles, supplies_to_send)
             
@@ -70,6 +69,8 @@ def bfs_supply_delivery(state, start_point, end_point):
             for neighbor, is_open in current_node.neighbours:
                 if is_open and neighbor.position not in visited:
                     new_distance = total_distance + manhattan_distance(current_position, neighbor.position)
-                    queue.append((neighbor.position, path + [neighbor.position], new_distance))
+                    heuristic_cost = heuristic(neighbor.position, end_point.position, state, end_point)
+                    pq.put((new_distance + heuristic_cost, neighbor.position, path + [neighbor.position], new_distance))
 
     return None, 0, "No path found."
+
