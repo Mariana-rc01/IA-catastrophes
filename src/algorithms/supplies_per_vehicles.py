@@ -2,7 +2,7 @@ import supply as sp
 import vehicle as vh
 from collections import defaultdict
 
-def split_supplies_per_vehicle(vehicles: list[vh.Vehicle], supplies: list[sp.Supply]) -> list[list[sp.Supply]]:
+def split_supplies_per_vehicle(vehicles, supplies):
     supply_type_data = defaultdict(lambda: None)
     supplies_per_vehicle = [[] for _ in range(len(vehicles))]
     

@@ -2,6 +2,7 @@ from geography.geography import load_map_data_to_graph
 from ui.viewer import Viewer
 import tkinter as tk
 from algorithms.uninformed.bfs import bfs_supply_delivery
+from algorithms.uninformed.dfs import dfs_supply_delivery
 from algorithms.uninformed.iterative_deepening import ids_supply_delivery
 from algorithms.uninformed.uniform_cost import ucs_supply_delivery
 from algorithms.informed.greedy import greedy_supply_delivery
@@ -27,7 +28,8 @@ def main():
 
     # Example
     #path, total_distance, supplies_info = bfs_supply_delivery(state, state.start_point, state.end_points[0])
-    path, total_distance, supplies_info = ids_supply_delivery(state, state.start_point, state.end_points[0])
+    path, total_distance, supplies_info = dfs_supply_delivery(state, state.start_point, state.end_points[0])
+    #path, total_distance, supplies_info = ids_supply_delivery(state, state.start_point, state.end_points[0])
     #path, total_distance, supplies_info = ucs_supply_delivery(state, state.start_point, state.end_points[0])
     #path, total_distance, supplies_info = a_star_supply_delivery(state, state.start_point, state.end_points[0], final_combined_heuristic)
     #path, total_distance, supplies_info = a_star_supply_delivery(state, state.start_point, state.end_points[0], manhattan_heuristic)
