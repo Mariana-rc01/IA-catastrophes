@@ -4,7 +4,7 @@ from vehicle import VehicleStatus
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
 from algorithms.utils import manhattan_distance
 
-def bfs_supply_delivery(state, start_point, end_point):
+def bfs_supply_delivery(state, start_point, end_point, terrain):
     # Check needed supplies
     needed_supplies = end_point.supplies_needed
     available_supplies = start_point.supplies
@@ -35,7 +35,9 @@ def bfs_supply_delivery(state, start_point, end_point):
 
         if current_position == end_point.position:
             #split supplies per vehicle
-            vehicles = [v for v in state.vehicles if v.position == start_point.position and v.vehicle_status == VehicleStatus.IDLE and v.current_fuel >= total_distance]
+            vehicles = [v for v in state.vehicles if v.position == start_point.position
+                        and v.vehicle_status == VehicleStatus.IDLE and v.current_fuel >= total_distance
+                        and v.type.can_access_terrain(terrain)]
             supplies_per_vehicle = split_supplies_per_vehicle(vehicles, supplies_to_send)
             
             for vehicle, supplies in zip(vehicles, supplies_per_vehicle):
@@ -66,7 +68,7 @@ def bfs_supply_delivery(state, start_point, end_point):
         current_node = state.graph.nodes.get(current_position)
         if current_node:
             for neighbor, is_open in current_node.neighbours:
-                if is_open and neighbor.position not in visited:
+                if is_open and neighbor.position not in visited and neighbor.can_access_terrain(terrain):
                     new_distance = total_distance + manhattan_distance(current_position, neighbor.position)
                     queue.append((neighbor.position, path + [neighbor.position], new_distance))
 

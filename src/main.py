@@ -27,13 +27,13 @@ def main():
     print("Supplies iniciais no start_point:", {s.type.name: s.quantity for s in state.start_point.supplies})
 
     # Example
-    #path, total_distance, supplies_info = bfs_supply_delivery(state, state.start_point, state.end_points[0])
-    path, total_distance, supplies_info = dfs_supply_delivery(state, state.start_point, state.end_points[0])
-    #path, total_distance, supplies_info = ids_supply_delivery(state, state.start_point, state.end_points[0])
-    #path, total_distance, supplies_info = ucs_supply_delivery(state, state.start_point, state.end_points[0])
-    #path, total_distance, supplies_info = a_star_supply_delivery(state, state.start_point, state.end_points[0], final_combined_heuristic)
-    #path, total_distance, supplies_info = a_star_supply_delivery(state, state.start_point, state.end_points[0], manhattan_heuristic)
-    #path, total_distance, supplies_info = greedy_supply_delivery(state, state.start_point, state.end_points[0], manhattan_heuristic)
+    #path, total_distance, supplies_info = bfs_supply_delivery(state, state.start_point, state.end_points[0], 0)
+    path, total_distance, supplies_info = dfs_supply_delivery(state, state.start_point, state.end_points[0], 0)
+    #path, total_distance, supplies_info = ids_supply_delivery(state, state.start_point, state.end_points[0], 0)
+    #path, total_distance, supplies_info = ucs_supply_delivery(state, state.start_point, state.end_points[0], 0)
+    #path, total_distance, supplies_info = a_star_supply_delivery(state, state.start_point, state.end_points[0], final_combined_heuristic, 0)
+    #path, total_distance, supplies_info = a_star_supply_delivery(state, state.start_point, state.end_points[0], manhattan_heuristic, 0)
+    #path, total_distance, supplies_info = greedy_supply_delivery(state, state.start_point, state.end_points[0], manhattan_heuristic, 0)
     
     if path:
         print("Caminho encontrado:", path)

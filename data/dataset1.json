@@ -7,7 +7,7 @@
             "position": [-8.3969801, 41.5588274],
             "type": {
                 "name": "Camião",
-                "transportation": "LAND",
+                "transportation": 0,
                 "fuel_capacity": 100,
                 "weight_capacity": 100,
                 "volume_capacity": 100,

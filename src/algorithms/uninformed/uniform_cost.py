@@ -6,7 +6,7 @@ from graph.node import Node
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
 from algorithms.utils import manhattan_distance
 
-def ucs_supply_delivery(state, start_point, end_point):
+def ucs_supply_delivery(state, start_point, end_point, terrain):
     def get_supplies_to_send(needed_supplies, available_supplies):
         supplies_to_send = []
         supplies_consumed = {supply_type: 0 for supply_type in sp.SupplyType}
@@ -88,6 +88,7 @@ def ucs_supply_delivery(state, start_point, end_point):
                 if v.position == start_point.position
                 and v.vehicle_status == vh.VehicleStatus.IDLE
                 and v.current_fuel >= total_distance
+                and v.type.can_access_terrain(terrain)
             ]
 
             supplies_per_vehicle = split_supplies_per_vehicle(
@@ -116,18 +117,16 @@ def ucs_supply_delivery(state, start_point, end_point):
 
         current_node = state.graph.nodes.get(current_position)
         if current_node:
-            for neighbor in current_node.neighbours:
-                neighbor_position, is_open = neighbor
-
-                if is_open and neighbor_position not in visited:
-                    if isinstance(neighbor_position, Node):
-                        neighbor_position = neighbor_position.position
+            for neighbor, is_open in current_node.neighbours:
+                if is_open and neighbor.position not in visited and neighbor.can_access_terrain(terrain):
+                    if isinstance(neighbor.position, Node):
+                        neighbor.position = neighbor.position
                     new_distance = total_distance + manhattan_distance(
-                        current_position, neighbor_position
+                        current_position, neighbor
                     )
                     heapq.heappush(
                         pq,
-                        (new_distance, neighbor_position, path + [neighbor_position]),
+                        (new_distance, neighbor.position, path + [neighbor.position]),
                     )
 
     return None, 0, "No path found."

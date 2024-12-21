@@ -9,7 +9,6 @@ class Transportation(Enum):
     AIR = 1
     SEA = 2
 
-
 class VehicleType:
     def __init__(self, name, transportation, fuel_capacity, weight_capacity, volume_capacity, average_velocity):
         self.name = name
@@ -18,6 +17,9 @@ class VehicleType:
         self.weight_capacity = weight_capacity
         self.volume_capacity = volume_capacity
         self.average_velocity = average_velocity
+
+    def can_access_terrain(self, terrain):
+        return self.transportation == terrain
 
 class Vehicle:
     def __init__(self, id, position, type, current_fuel, current_weight, current_volume, vehicle_status):

@@ -1,9 +1,10 @@
 from queue import PriorityQueue
+from algorithms.utils import manhattan_distance
 from supply import Supply, SupplyType
 from vehicle import VehicleStatus
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
 
-def greedy_supply_delivery(state, start_point, end_point, heuristic):
+def greedy_supply_delivery(state, start_point, end_point, heuristic, terrain):
     # Check needed supplies
     needed_supplies = end_point.supplies_needed
     available_supplies = start_point.supplies
@@ -23,10 +24,10 @@ def greedy_supply_delivery(state, start_point, end_point, heuristic):
     # Greedy Algorithm
     visited = set()
     pq = PriorityQueue()
-    pq.put((0, start_point.position, []))  # (heuristic, current_position, path)
+    pq.put((0, start_point.position, [], 0))  # (heuristic, current_position, path)
 
     while not pq.empty():
-        priority, current_position, path = pq.get()
+        priority, current_position, path, total_distance = pq.get()
 
         if current_position in visited:
             continue
@@ -34,13 +35,16 @@ def greedy_supply_delivery(state, start_point, end_point, heuristic):
 
         if current_position == end_point.position:
             # Assign supplies to vehicles
-            vehicles = [v for v in state.vehicles if v.position == start_point.position and v.vehicle_status == VehicleStatus.IDLE]
+            vehicles = [v for v in state.vehicles if v.position == start_point.position
+                        and v.vehicle_status == VehicleStatus.IDLE and v.type.can_access_terrain(terrain)
+                        and v.current_fuel >= total_distance]
             supplies_per_vehicle = split_supplies_per_vehicle(vehicles, supplies_to_send)
 
             for vehicle, supplies in zip(vehicles, supplies_per_vehicle):
                 if supplies:
                     vehicle.position = end_point.position
                     vehicle.vehicle_status = VehicleStatus.BUSY
+                    vehicle.current_fuel -= total_distance
 
             if supplies_per_vehicle:
                 for supply_type, quantity_used in supplies_consumed.items():
@@ -58,14 +62,15 @@ def greedy_supply_delivery(state, start_point, end_point, heuristic):
             else:
                 return None, 0, "There aren't any available vehicles."
 
-            return ([str(position) for position in path], len(path),
+            return ([str(position) for position in path], total_distance,
                 {vehicle.id: [s.type.name for s in supplies] for vehicle, supplies in zip(vehicles, supplies_per_vehicle)})
 
         current_node = state.graph.nodes.get(current_position)
         if current_node:
             for neighbor, is_open in current_node.neighbours:
-                if is_open and neighbor.position not in visited:
-                    heuristic_cost = heuristic(neighbor.position, end_point.position, state, end_point)
-                    pq.put((heuristic_cost, neighbor.position, path + [neighbor.position]))
+                if is_open and neighbor.position not in visited and neighbor.can_access_terrain(terrain):
+                        new_distance = total_distance + manhattan_distance(current_position, neighbor.position)
+                        heuristic_cost = heuristic(neighbor.position, end_point.position, state, end_point)
+                        pq.put((heuristic_cost, neighbor.position, path + [neighbor.position], new_distance))
 
     return None, 0, "No path found."
