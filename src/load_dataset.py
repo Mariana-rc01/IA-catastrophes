@@ -25,7 +25,7 @@ def load_dataset(dataset_path):
     supplies = [Supply(s['quantity'], SupplyType[s['type']]) for s in dataset['start_point']['supplies']]
     start_point = StartPoint(start_position, supplies)
 
-    end_points = [EndPoint(Position(*ep['position']), ep['needsSupplies']) for ep in dataset['end_points']]
+    end_points = [EndPoint(Position(*ep['position']), ep['needs_supplies']) for ep in dataset['end_points']]
 
     vehicles = []
     for vehicle in dataset['vehicles']:

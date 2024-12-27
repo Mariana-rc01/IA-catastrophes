@@ -29,7 +29,7 @@
     "end_points": [
         {
             "position": [-8.3798922, 41.5684793],
-            "needsSupplies": {
+            "needs_supplies": {
                 "Water": 7,
                 "Food": 4
             }
