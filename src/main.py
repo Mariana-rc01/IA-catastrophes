@@ -7,27 +7,38 @@ from algorithms.uninformed.iterative_deepening import ids_supply_delivery
 from algorithms.uninformed.uniform_cost import ucs_supply_delivery
 from algorithms.informed.greedy import greedy_supply_delivery
 from algorithms.informed.a_star import a_star_supply_delivery
-from algorithms.informed.heuristics import manhattan_heuristic, time_estimation_heuristic, blocked_route_heuristic, dynamic_supply_priority_heuristic, delivery_success_probability_heuristic, final_combined_heuristic
+from algorithms.informed.heuristics import manhattan_heuristic, final_combined_heuristic
 from load_dataset import load_dataset
+import time
 
 algorithm = "bfs"  # Default algorithm
+app = None
+state = None
 
 def main():
     global algorithm
+    global app
+    global state
 
-    ## SETUP
-    # Load dataset
     state = load_dataset("data/dataset1.json")
 
-    # Initialize the Viewer and pass a callback to update the algorithm
     root = tk.Tk()
-    app = Viewer(root, lambda selected_algorithm: set_algorithm(selected_algorithm))
-    app.display_graph(state.graph, state.start_point, state.end_points)
+    app = Viewer(
+        root,
+        algorithm_callback=lambda selected_algorithm: set_algorithm(selected_algorithm),
+        start_simulation_callback=lambda: run_algorithm(state),
+        restart_simulation_callback=lambda: restart_simulation()
+    )
+    app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
     app.run()
 
-    print("Supplies iniciais no start_point:", {s.type.name: s.quantity for s in state.start_point.supplies})
+def set_algorithm(selected_algorithm):
+    global algorithm
+    algorithm = selected_algorithm
+    print(f"Algorithm updated to: {algorithm}")
 
-    # Select the appropriate algorithm
+def run_algorithm(state):
+    global algorithm
     algorithm_functions = {
         "bfs": bfs_supply_delivery,
         "dfs": dfs_supply_delivery,
@@ -41,20 +52,17 @@ def main():
     if selected_function:
         path, total_distance, supplies_info = selected_function(state, state.start_point, state.end_points[0], 0)
         if path:
-            print("Caminho encontrado:", path)
-            print("Distância total:", total_distance)
-            print("Supplies enviados por veículo:", supplies_info)
-            print("Supplies restantes no start_point:", {s.type.name: s.quantity for s in state.start_point.supplies})
-            print("Supplies necessários no end_point:", state.end_points[0].get_supplies_needed())
+            print("Path found.")
         else:
-            print("Nenhum caminho disponível.")
-            print(f"{supplies_info}")
-            print("Supplies restantes no start_point:", {s.type.name: s.quantity for s in state.start_point.supplies})
+            print("No available path.")
 
-def set_algorithm(selected_algorithm):
-    global algorithm
-    algorithm = selected_algorithm
-    print(f"Algorithm globally updated to: {algorithm}")
+    app.draw_path(state.graph, path, on_complete=lambda: app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles))
+
+def restart_simulation():
+    global state
+    state = load_dataset("data/dataset1.json")
+    print("Simulation restarted.")
+    app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
 
 if __name__ == '__main__':
     main()

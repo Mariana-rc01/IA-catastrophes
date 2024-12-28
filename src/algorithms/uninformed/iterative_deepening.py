@@ -58,7 +58,7 @@ def ids_supply_delivery(state, start_point, end_point, terrain, max_depth_limit=
             else:
                 return None, 0, print("There aren't any available vehicles.")
 
-            return ([str(position) for position in path], total_distance, True)
+            return ([start_point.position] + path, total_distance, True)
 
         current_node = state.graph.nodes.get(current_position)
         if current_node:

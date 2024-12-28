@@ -62,7 +62,7 @@ def bfs_supply_delivery(state, start_point, end_point, terrain):
             else:
                 return None, 0, print("There aren't any available vehicles.")
 
-            return ([str(position) for position in path], total_distance,
+            return ([start_point.position] + path, total_distance,
                 {vehicle.id: [s.type.name for s in supplies] for vehicle, supplies in zip(vehicles, supplies_per_vehicle)})
 
         current_node = state.graph.nodes.get(current_position)

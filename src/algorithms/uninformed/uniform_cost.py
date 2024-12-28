@@ -107,7 +107,7 @@ def ucs_supply_delivery(state, start_point, end_point, terrain):
                 return result
 
             return (
-                [str(position) for position in path],
+                [start_point.position] + path,
                 total_distance,
                 {
                     vehicle.id: [s.type.name for s in supplies]
