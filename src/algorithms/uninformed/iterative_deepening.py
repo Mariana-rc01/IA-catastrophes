@@ -44,13 +44,17 @@ def ids_supply_delivery(state, start_point, end_point, terrain, weather, max_dep
                     vehicle.vehicle_status = VehicleStatus.BUSY
                     vehicle.current_fuel -= total_distance
 
-                    velocity = vehicle.type.average_velocity
-                    for position in path:
-                        weather_condition = weather.get_condition(position)
+                    for i in range(len(path) - 1):
+                        start_pos = path[i]
+                        end_pos = path[i + 1]
+                        
+                        weather_condition = weather.get_condition(start_pos)
                         velocity = vehicle.type.adjust_velocity(weather_condition)
-
-                        time_for_vehicle = total_distance / velocity if velocity > 0 else float('inf')
-                        total_time = max(total_time, time_for_vehicle)
+                        distance = manhattan_distance(start_pos, end_pos)
+                        
+                        time_for_vehicle = distance / velocity if velocity > 0 else float('inf')
+                        
+                        total_time += time_for_vehicle
 
             if supplies_per_vehicle:
                 for supply_type, quantity_used in supplies_consumed.items():
