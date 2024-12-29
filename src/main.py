@@ -1,4 +1,5 @@
 from geography.geography import load_map_data_to_graph
+from graph.position import Position
 from ui.viewer import Viewer
 import tkinter as tk
 from algorithms.uninformed.bfs import bfs_supply_delivery
@@ -10,6 +11,8 @@ from algorithms.informed.a_star import a_star_supply_delivery
 from algorithms.informed.heuristics import manhattan_heuristic, final_combined_heuristic
 from load_dataset import load_dataset
 import time
+
+from weather import Weather, WeatherCondition
 
 algorithm = "bfs"  # Default algorithm
 app = None
@@ -44,13 +47,20 @@ def run_algorithm(state):
         "dfs": dfs_supply_delivery,
         "ids": ids_supply_delivery,
         "ucs": ucs_supply_delivery,
-        "a_star": lambda state, start, end, cost: a_star_supply_delivery(state, start, end, final_combined_heuristic, cost),
-        "greedy": lambda state, start, end, cost: greedy_supply_delivery(state, start, end, manhattan_heuristic, cost),
+        "a_star": lambda state, start, end, terrain, weather: a_star_supply_delivery(state, start, end, final_combined_heuristic, terrain, weather),
+        "greedy": lambda state, start, end, terrain, weather: greedy_supply_delivery(state, start, end, manhattan_heuristic, terrain, weather),
     }
     selected_function = algorithm_functions.get(algorithm)
 
     if selected_function:
-        path, total_distance, supplies_info = selected_function(state, state.start_point, state.end_points[0], 0)
+        # Criar o objeto Weather
+        weather = Weather()
+
+        # Definir condições meteorológicas
+        position = Position(-8.3969801, 41.5588274)
+        weather.set_condition(position, WeatherCondition.SUNNY)
+
+        path, total_distance, total_time, supplies_info = selected_function(state, state.start_point, state.end_points[0], 0, weather)
         if path:
             print("Path found.")
         else:

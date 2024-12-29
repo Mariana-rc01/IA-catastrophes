@@ -3,8 +3,9 @@ from supply import SupplyType, Supply
 from vehicle import VehicleStatus
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
 from algorithms.utils import manhattan_distance
+from weather import WeatherCondition
 
-def dfs_supply_delivery(state, start_point, end_point, terrain):
+def dfs_supply_delivery(state, start_point, end_point, terrain, weather):
     # Check needed supplies
     needed_supplies = end_point.supplies_needed
     available_supplies = start_point.supplies
@@ -40,11 +41,20 @@ def dfs_supply_delivery(state, start_point, end_point, terrain):
                         and v.current_fuel >= total_distance and v.type.can_access_terrain(terrain)]
             supplies_per_vehicle = split_supplies_per_vehicle(vehicles, supplies_to_send)
 
+            total_time = 0
             for vehicle, supplies in zip(vehicles, supplies_per_vehicle):
                 if supplies:
                     vehicle.position = end_point.position
                     vehicle.vehicle_status = VehicleStatus.BUSY
                     vehicle.current_fuel -= total_distance
+
+                    velocity = vehicle.type.average_velocity
+                    for position in path:
+                        weather_condition = weather.get_condition(position)
+                        velocity = vehicle.type.adjust_velocity(weather_condition)
+
+                        time_for_vehicle = total_distance / velocity if velocity > 0 else float('inf')
+                        total_time = max(total_time, time_for_vehicle)
 
             if supplies_per_vehicle:
                 for supply_type, quantity_used in supplies_consumed.items():
@@ -60,16 +70,25 @@ def dfs_supply_delivery(state, start_point, end_point, terrain):
                                     end_point.satisfy_supplies([Supply(supply.quantity, supply_type)])
                                     supply.quantity = 0
             else:
-                return None, 0, print("There aren't any available vehicles.")
+                return None, 0, 0, print("There aren't any available vehicles.")
 
-            return ([start_point.position] + path, total_distance,
+            return ([start_point.position] + path, total_distance, total_time,
                 {vehicle.id: [s.type.name for s in supplies] for vehicle, supplies in zip(vehicles, supplies_per_vehicle)})
 
         current_node = state.graph.nodes.get(current_position)
         if current_node:
             for neighbor, is_open in reversed(current_node.neighbours):
-                if is_open and neighbor.position not in visited and neighbor.can_access_terrain(terrain):
-                    new_distance = total_distance + manhattan_distance(current_position, neighbor.position)
+                if is_open and neighbor.position not in visited and neighbor.can_access_terrain(terrain, weather):
+                    weather_condition = weather.get_condition(neighbor.position)
+                    distance = manhattan_distance(current_position, neighbor.position)
+
+                    # We adjust the distance based on the weather conditions
+                    if weather_condition == WeatherCondition.SNOWY:
+                        distance *= 1.25
+                    elif weather_condition == WeatherCondition.RAINY:
+                        distance *= 1.1
+
+                    new_distance = total_distance + distance
                     stack.append((neighbor.position, path + [neighbor.position], new_distance))
 
-    return None, 0, "No path found."
+    return None, 0, 0, "No path found."

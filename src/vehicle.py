@@ -1,5 +1,7 @@
 from enum import Enum
 
+from weather import Weather, WeatherCondition
+
 class VehicleStatus(Enum):
     IDLE = 0
     BUSY = 1
@@ -17,6 +19,15 @@ class VehicleType:
         self.weight_capacity = weight_capacity
         self.volume_capacity = volume_capacity
         self.average_velocity = average_velocity
+
+    def adjust_velocity(self, weather):
+        if weather == WeatherCondition.STORM:
+            return self.average_velocity * 0.5
+        elif weather == WeatherCondition.SNOWY:
+            return self.average_velocity * 0.75
+        elif weather == WeatherCondition.RAINY:
+            return self.average_velocity * 0.9
+        return self.average_velocity
 
     def can_access_terrain(self, terrain):
         return self.transportation == terrain

@@ -2,8 +2,9 @@ from supply import SupplyType, Supply
 from vehicle import VehicleStatus
 from algorithms.supplies_per_vehicles import split_supplies_per_vehicle
 from algorithms.utils import manhattan_distance
+from weather import WeatherCondition
 
-def ids_supply_delivery(state, start_point, end_point, terrain, max_depth_limit=50):
+def ids_supply_delivery(state, start_point, end_point, terrain, weather, max_depth_limit=50):
     # Check needed supplies
     needed_supplies = end_point.supplies_needed
     available_supplies = start_point.supplies
@@ -22,10 +23,10 @@ def ids_supply_delivery(state, start_point, end_point, terrain, max_depth_limit=
 
     def depth_limited_search(current_position, path, total_distance, depth_limit, visited):
         if depth_limit < 0:
-            return None, 0, False  # No path found within this limit
+            return None, 0, 0, False  # No path found within this limit
 
         if current_position in visited:
-            return None, 0, False
+            return None, 0, 0, False
 
         visited.add(current_position)
 
@@ -36,11 +37,20 @@ def ids_supply_delivery(state, start_point, end_point, terrain, max_depth_limit=
                         and v.current_fuel >= total_distance and v.type.can_access_terrain(terrain)]
             supplies_per_vehicle = split_supplies_per_vehicle(vehicles, supplies_to_send)
 
+            total_time = 0
             for vehicle, supplies in zip(vehicles, supplies_per_vehicle):
                 if supplies:
                     vehicle.position = end_point.position
                     vehicle.vehicle_status = VehicleStatus.BUSY
                     vehicle.current_fuel -= total_distance
+
+                    velocity = vehicle.type.average_velocity
+                    for position in path:
+                        weather_condition = weather.get_condition(position)
+                        velocity = vehicle.type.adjust_velocity(weather_condition)
+
+                        time_for_vehicle = total_distance / velocity if velocity > 0 else float('inf')
+                        total_time = max(total_time, time_for_vehicle)
 
             if supplies_per_vehicle:
                 for supply_type, quantity_used in supplies_consumed.items():
@@ -56,28 +66,37 @@ def ids_supply_delivery(state, start_point, end_point, terrain, max_depth_limit=
                                     end_point.satisfy_supplies([Supply(supply.quantity, supply_type)])
                                     supply.quantity = 0
             else:
-                return None, 0, print("There aren't any available vehicles.")
+                return None, 0, 0, print("There aren't any available vehicles.")
 
-            return ([start_point.position] + path, total_distance, True)
+            return ([start_point.position] + path, total_distance, total_time, True)
 
         current_node = state.graph.nodes.get(current_position)
         if current_node:
             for neighbor, is_open in reversed(current_node.neighbours):
-                if is_open and neighbor.position not in visited and neighbor.can_access_terrain(terrain):
-                    new_distance = total_distance + manhattan_distance(current_position, neighbor.position)
-                    result, distance, found = depth_limited_search(
+                if is_open and neighbor.position not in visited and neighbor.can_access_terrain(terrain, weather):
+                    weather_condition = weather.get_condition(neighbor.position)
+                    distance = manhattan_distance(current_position, neighbor.position)
+
+                    # We adjust the distance based on the weather conditions
+                    if weather_condition == WeatherCondition.SNOWY:
+                        distance *= 1.25
+                    elif weather_condition == WeatherCondition.RAINY:
+                        distance *= 1.1
+
+                    new_distance = total_distance + distance
+                    result, distance, time, found = depth_limited_search(
                         neighbor.position, path + [neighbor.position], new_distance, depth_limit - 1, visited
                     )
                     if found:
-                        return result, distance, True
+                        return result, distance, time, True
 
-        return None, 0, False
+        return None, 0, 0, False
 
     # Iterative Deepening
     for depth_limit in range(max_depth_limit):
         visited = set()
-        result, distance, found = depth_limited_search(start_point.position, [], 0, depth_limit, visited)
+        result, distance, time, found = depth_limited_search(start_point.position, [], 0, depth_limit, visited)
         if found:
-            return result, distance, {vehicle.id: [supplies.type.name] for vehicle, supplies in zip(state.vehicles, supplies_to_send) if supplies.quantity > 0}
+            return result, distance, time, {vehicle.id: [supplies.type.name] for vehicle, supplies in zip(state.vehicles, supplies_to_send) if supplies.quantity > 0}
 
-    return None, 0, "No path found."
+    return None, 0, 0, "No path found."
