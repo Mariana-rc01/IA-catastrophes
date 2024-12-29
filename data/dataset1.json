@@ -32,7 +32,8 @@
             "needs_supplies": {
                 "Water": 7,
                 "Food": 4
-            }
+            },
+            "priority": 1
         }
     ]
 }

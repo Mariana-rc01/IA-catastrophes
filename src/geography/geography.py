@@ -9,7 +9,10 @@ def load_map_data_to_graph(geography):
 
     for node, data in G.nodes(data=True):
         position = Position(data['x'], data['y'])
-        graph.add_node(position)
+        priority = 0
+        if 'priority' in data:
+            priority = data['priority']
+        graph.add_node(position, priority)
 
     for u, v in G.edges():
         pos1 = Position(G.nodes[u]['x'], G.nodes[u]['y'])
