@@ -63,10 +63,14 @@ class Viewer:
         self.root.config(menu=menu)
 
         # Restart simulation
-        menu.add_command(label="↺ Restart", command=self.restart_simulation_callback)
+        menu.add_command(label="↺ Restart", command=self.restart_simulation)
 
         # Block Route
         menu.add_command(label="Block Route", command=self.block_route_ui)
+
+    def restart_simulation(self):
+        self.blocked_routes.clear()
+        self.restart_simulation_callback()
 
     def block_route_ui(self):
         block_route_window = Toplevel(self.root)
