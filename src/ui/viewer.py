@@ -40,8 +40,8 @@ class Viewer:
         vehicle_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "truck.png")
         self.original_vehicle_image = Image.open(vehicle_image_path)
 
-        vehicle1_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "square.png")
-        self.original_vehicle1_image = Image.open(vehicle1_image_path)
+        square_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "square.png")
+        self.original_square_image = Image.open(square_image_path)
 
         self.tooltip = Label(root, text="", bg="white", fg="black", bd=1, relief=SOLID, padx=5, pady=2)
         self.tooltip.place_forget()
@@ -136,8 +136,8 @@ class Viewer:
                 mid_y = (y1 + y2) / 2
                 
                 # Tooltip information
-                vehicle_image = self.original_vehicle1_image.resize((5, 5), Image.BILINEAR)
-                tk_edge_image = ImageTk.PhotoImage(vehicle_image)
+                square_image = self.original_square_image.resize((5, 5), Image.BILINEAR)
+                tk_edge_image = ImageTk.PhotoImage(square_image)
                 self.images_on_canvas.append(tk_edge_image)
                 idEdge = self.canvas.create_image(mid_x, mid_y, image=tk_edge_image, anchor=CENTER)
                 edge_text = f"Edge: {node.id},{neighbour.id}"
