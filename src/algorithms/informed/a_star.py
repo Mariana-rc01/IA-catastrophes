@@ -6,7 +6,7 @@ from supply import Supply, SupplyType
 from vehicle import VehicleStatus
 from weather import WeatherCondition
 
-def a_star_supply_delivery(state, start_point, end_point, heuristic, terrain, weather):
+def a_star_supply_delivery(state, start_point, end_point, heuristic, terrain, weather, blocked_routes):
     # Check needed supplies
     needed_supplies = end_point.supplies_needed
     available_supplies = start_point.supplies
@@ -83,7 +83,8 @@ def a_star_supply_delivery(state, start_point, end_point, heuristic, terrain, we
         current_node = state.graph.nodes.get(current_position)
         if current_node:
             for neighbor, is_open in current_node.neighbours:
-                if is_open and neighbor.position not in visited and neighbor.can_access_terrain(terrain, weather):
+                route1, route2 = f'{current_node.id},{neighbor.id}', f'{neighbor.id},{current_node.id}'
+                if is_open and neighbor.position not in visited and neighbor.can_access_terrain(terrain, weather) and route1 not in blocked_routes and route2 not in blocked_routes:
                         weather_condition = weather.get_condition(neighbor.position)
                         distance = manhattan_distance(current_position, neighbor.position)
 

@@ -1,7 +1,8 @@
 import weather
 
 class Node:
-    def __init__(self, position, priority):
+    def __init__(self, position, priority, id):
+        self.id = id
         self.position = position
         self.neighbours = []  # List of tuples (Node, open: bool)
         self.accessible_terrains = [0,1,2] # List of Terrain
