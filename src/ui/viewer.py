@@ -40,6 +40,9 @@ class Viewer:
         vehicle_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "truck.png")
         self.original_vehicle_image = Image.open(vehicle_image_path)
 
+        vehicle1_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "square.png")
+        self.original_vehicle1_image = Image.open(vehicle1_image_path)
+
         self.tooltip = Label(root, text="", bg="white", fg="black", bd=1, relief=SOLID, padx=5, pady=2)
         self.tooltip.place_forget()
 
@@ -132,9 +135,16 @@ class Viewer:
                 mid_x = (x1 + x2) / 2
                 mid_y = (y1 + y2) / 2
                 
-                # Add a label at the midpoint
-                edge_label = f"{node.id}, {neighbour.id}"
-                self.canvas.create_text(mid_x, mid_y, text=edge_label, fill="blue")
+                # Tooltip information
+                vehicle_image = self.original_vehicle1_image.resize((5, 5), Image.BILINEAR)
+                tk_edge_image = ImageTk.PhotoImage(vehicle_image)
+                self.images_on_canvas.append(tk_edge_image)
+                idEdge = self.canvas.create_image(mid_x, mid_y, image=tk_edge_image, anchor=CENTER)
+                edge_text = f"Edge: {node.id},{neighbour.id}"
+
+                # Bind tooltip to the graphical edge ID
+                self.canvas.tag_bind(idEdge, "<Enter>", lambda e, t=edge_text: self.show_tooltip(e, t))
+                self.canvas.tag_bind(idEdge, "<Leave>", self.hide_tooltip)
 
         # Draw nodes
         for node in graph.nodes.values():
