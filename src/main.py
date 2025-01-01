@@ -1,3 +1,4 @@
+from algorithms.informed import heuristics
 from geography.geography import load_map_data_to_graph
 from graph.position import Position
 from ui.viewer import Viewer
@@ -17,6 +18,7 @@ from weather import Weather, WeatherCondition
 algorithm = "bfs"  # Default algorithm
 app = None
 state = None
+heuristic = "manhattan_heuristic"  # Default heuristic
 
 def main():
     global algorithm
@@ -28,18 +30,23 @@ def main():
     root = tk.Tk()
     app = Viewer(
         root,
-        algorithm_callback=lambda selected_algorithm, blocked_routes: set_algorithm(selected_algorithm, blocked_routes),
+        algorithm_callback=lambda selected_algorithm, blocked_routes, selected_heuristic: set_algorithm(selected_algorithm, blocked_routes, selected_heuristic),
         start_simulation_callback=lambda: run_algorithm(state),
-        restart_simulation_callback=lambda: restart_simulation()
+        restart_simulation_callback=lambda: restart_simulation(),
+        endpoints_callback=lambda: get_endpoints()
     )
     app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
     app.run()
 
-def set_algorithm(selected_algorithm, blocked_routes):
+def set_algorithm(selected_algorithm, blocked_routes, selected_heuristic):
     global algorithm
     algorithm = selected_algorithm
+    heuristic = selected_heuristic
     print(f"Algorithm updated to: {algorithm}")
     print(f"Blocked routes: {blocked_routes}")
+
+def get_endpoints():
+    return state.end_points
 
 def run_algorithm(state):
     global algorithm
@@ -48,8 +55,12 @@ def run_algorithm(state):
         "dfs": dfs_supply_delivery,
         "ids": ids_supply_delivery,
         "ucs": ucs_supply_delivery,
-        "a_star": lambda state, start, end, terrain, weather, blocked_routes: a_star_supply_delivery(state, start, end, final_combined_heuristic, terrain, weather, blocked_routes),
-        "greedy": lambda state, start, end, terrain, weather, blocked_routes: greedy_supply_delivery(state, start, end, manhattan_heuristic, terrain, weather, blocked_routes),
+        "a_star": lambda state, start, end, terrain, weather, blocked_routes: a_star_supply_delivery(
+            state, start, end, getattr(heuristics, heuristic), terrain, weather, blocked_routes
+        ),
+        "greedy": lambda state, start, end, terrain, weather, blocked_routes: greedy_supply_delivery(
+            state, start, end, getattr(heuristics, heuristic), terrain, weather, blocked_routes
+        ),
     }
     selected_function = algorithm_functions.get(algorithm)
 
@@ -61,11 +72,13 @@ def run_algorithm(state):
         position = Position(-8.3969801, 41.5588274)
         weather.set_condition(position, WeatherCondition.SUNNY)
 
+        selected_end_point = state.end_points[app.selected_end_point_index]
+
         # Pass blocked_routes as an additional argument
         path, total_distance, total_time, supplies_info = selected_function(
             state, 
             state.start_point, 
-            state.end_points[0], 
+            selected_end_point, 
             0, 
             weather,
             app.blocked_routes  # Pass blocked routes here

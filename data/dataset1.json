@@ -22,8 +22,8 @@
     "start_point": {
         "position": [-8.3969801, 41.5588274],
         "supplies": [
-            {"quantity": 10, "type": "Water"},
-            {"quantity": 5, "type": "Food"}
+            {"quantity": 50, "type": "Water"},
+            {"quantity": 50, "type": "Food"}
         ]
     },
     "end_points": [
@@ -32,6 +32,22 @@
             "needs_supplies": {
                 "Water": 7,
                 "Food": 4
+            },
+            "priority": 1
+        },
+        {
+            "position": [-8.3840251, 41.5714768],
+            "needs_supplies": {
+                "Water": 15,
+                "Food": 30
+            },
+            "priority": 0
+        },
+        {
+            "position": [-8.392092, 41.5691318],
+            "needs_supplies": {
+                "Water": 3,
+                "Food": 2
             },
             "priority": 1
         }

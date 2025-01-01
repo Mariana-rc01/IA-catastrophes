@@ -5,9 +5,9 @@ class Graph:
     def __init__(self):
         self.nodes = {}
         
-    def add_node(self, position, priority = 0, id = 0):
+    def add_node(self, position, id = 0):
         if position not in self.nodes:
-            self.nodes[position] = Node(position, priority, id)
+            self.nodes[position] = Node(position, id)
 
     def add_edge(self, pos1, pos2, open=True):
         if pos1 in self.nodes and pos2 in self.nodes:

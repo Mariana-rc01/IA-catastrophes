@@ -1,7 +1,8 @@
 class EndPoint:
-    def __init__(self, position, supplies_needed):
+    def __init__(self, position, supplies_needed, priority):
         self.position = position
         self.supplies_needed = supplies_needed
+        self.priority = priority
 
     def get_supplies_needed(self):
         return {supply_type: quantity for supply_type, quantity in self.supplies_needed.items() if quantity > 0}
