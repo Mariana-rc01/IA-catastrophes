@@ -88,6 +88,7 @@ def run_algorithm(state):
         else:
             print("No available path.")
 
+        app.show_info_box(total_distance*100, total_time*60)
     app.draw_path(state.graph, path, on_complete=lambda: app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles))
 
 

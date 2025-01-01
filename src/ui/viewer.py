@@ -267,6 +267,31 @@ class Viewer:
         # Start drawing the path from the first segment
         draw_segment(0)
 
+    def show_info_box(self, total_distance, total_time):
+        info_box = Toplevel(self.root)
+        info_box.title("Simulation Info")
+        info_box.resizable(False, False)
+        
+        root_width = self.root.winfo_width()
+        root_height = self.root.winfo_height()
+
+        info_box_width = 300
+        info_box_height = 150
+        x_position = root_width - info_box_width
+        y_position = root_height - info_box_height
+
+        info_box.geometry(f"{info_box_width}x{info_box_height}+{x_position}+{y_position}")
+
+        Label(info_box, 
+            text=f"Total Distance: {total_distance:.2f} km\nTotal Time: {total_time:.2f} hours",
+            font=("Arial", 12),
+            justify="center",
+            padx=30,
+            pady=30).pack()
+
+        Button(info_box, text="OK", command=info_box.destroy).pack(pady=10)
+        info_box.after(5000, info_box.destroy)
+
     def select_algorithm(self, selected_algorithm):
         self.algorithm_callback(selected_algorithm, self.blocked_routes, self.selected_heuristic)
         self.selected_algorithm = selected_algorithm
