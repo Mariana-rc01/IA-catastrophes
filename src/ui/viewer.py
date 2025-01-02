@@ -22,6 +22,11 @@ heuristics = {
     "final_combined_heuristic": "Final Combined",
 }
 
+terrains = {
+    0: "LAND",
+    1: "AIR",
+    2: "WATER"
+}
 
 class Viewer:
     def __init__(self, root, algorithm_callback, start_simulation_callback, restart_simulation_callback, endpoints_callback):
@@ -40,6 +45,7 @@ class Viewer:
 
         self.selected_algorithm = list(algorithms.keys())[0]
         self.selected_heuristic = list(heuristics.keys())[0]
+        self.selected_terrain = list(terrains.keys())[0]
         self.setup_ui()
 
         self.blocked_routes = set()
@@ -97,6 +103,14 @@ class Viewer:
                 command=lambda idx=idx: self.select_end_point(idx),
             )
         menu.add_cascade(label="Select End Point", menu=end_point_menu)
+
+        terrain_menu = Menu(menu, tearoff=0)
+        for terrain_key, terrain_name in terrains.items():
+            terrain_menu.add_command(
+                label=terrain_name,
+                command=lambda key=terrain_key: self.select_terrain(key)
+            )
+        menu.add_cascade(label=f"terrain: {self.selected_terrain}", menu=terrain_menu)
 
         # Restart simulation
         menu.add_command(label="↺ Restart", command=self.restart_simulation)
@@ -306,7 +320,7 @@ class Viewer:
         info_box.after(5000, info_box.destroy)
 
     def select_algorithm(self, selected_algorithm):
-        self.algorithm_callback(selected_algorithm, self.blocked_routes, self.selected_heuristic)
+        self.algorithm_callback(selected_algorithm, self.blocked_routes, self.selected_heuristic, self.selected_terrain)
         self.selected_algorithm = selected_algorithm
         self.update_menu_label()
 
@@ -315,7 +329,14 @@ class Viewer:
 
     def select_heuristic(self, selected_heuristic):
         self.selected_heuristic = selected_heuristic
+        self.algorithm_callback(self.selected_algorithm, self.blocked_routes, self.selected_heuristic, self.selected_terrain)
         print(f"Heuristic updated to: {selected_heuristic}")
+        self.update_menu_label()
+
+    def select_terrain(self, selected_terrain):
+        self.selected_terrain = selected_terrain
+        self.algorithm_callback(self.selected_algorithm, self.blocked_routes, self.selected_heuristic, self.selected_terrain)
+        print(f"Terrain updated to: {self.selected_terrain}")
         self.update_menu_label()
 
     def block_route(self, route):

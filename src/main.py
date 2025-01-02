@@ -19,9 +19,10 @@ algorithm = "bfs"  # Default algorithm
 app = None
 state = None
 heuristic = "manhattan_heuristic"  # Default heuristic
+terrain = 0  # Default terrain
 
 def main():
-    global algorithm
+    global algorithm, heuristic, terrain
     global app
     global state
 
@@ -30,7 +31,7 @@ def main():
     root = tk.Tk()
     app = Viewer(
         root,
-        algorithm_callback=lambda selected_algorithm, blocked_routes, selected_heuristic: set_algorithm(selected_algorithm, blocked_routes, selected_heuristic),
+        algorithm_callback=lambda selected_algorithm, blocked_routes, selected_heuristic, selected_terrain: set_algorithm(selected_algorithm, blocked_routes, selected_heuristic, selected_terrain),
         start_simulation_callback=lambda: run_algorithm(state),
         restart_simulation_callback=lambda: restart_simulation(),
         endpoints_callback=lambda: get_endpoints()
@@ -38,10 +39,11 @@ def main():
     app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
     app.run()
 
-def set_algorithm(selected_algorithm, blocked_routes, selected_heuristic):
-    global algorithm
+def set_algorithm(selected_algorithm, blocked_routes, selected_heuristic, selected_terrain):
+    global algorithm, heuristic, terrain
     algorithm = selected_algorithm
     heuristic = selected_heuristic
+    terrain = selected_terrain
     print(f"Algorithm updated to: {algorithm}")
     print(f"Blocked routes: {blocked_routes}")
 
@@ -49,7 +51,7 @@ def get_endpoints():
     return state.end_points
 
 def run_algorithm(state):
-    global algorithm
+    global algorithm, heuristic, terrain
     algorithm_functions = {
         "bfs": bfs_supply_delivery,
         "dfs": dfs_supply_delivery,
@@ -79,7 +81,7 @@ def run_algorithm(state):
             state, 
             state.start_point, 
             selected_end_point, 
-            0, 
+            terrain, 
             weather,
             app.blocked_routes  # Pass blocked routes here
         )
