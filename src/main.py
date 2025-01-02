@@ -1,5 +1,4 @@
 from algorithms.informed import heuristics
-from geography.geography import load_map_data_to_graph
 from graph.position import Position
 from ui.viewer import Viewer
 import tkinter as tk
@@ -9,10 +8,9 @@ from algorithms.uninformed.iterative_deepening import ids_supply_delivery
 from algorithms.uninformed.uniform_cost import ucs_supply_delivery
 from algorithms.informed.greedy import greedy_supply_delivery
 from algorithms.informed.a_star import a_star_supply_delivery
-from algorithms.informed.heuristics import manhattan_heuristic, final_combined_heuristic
 from load_dataset import load_dataset
-import time
 
+from vehicle import VehicleStatus
 from weather import Weather, WeatherCondition
 
 algorithm = "bfs"  # Default algorithm
@@ -107,6 +105,9 @@ def reposition_vehicles_to_start():
 
     for vehicle in state.vehicles:
         vehicle.position = start_position
+        vehicle.vehicle_status = VehicleStatus.IDLE
+        vehicle.current_weight = 0
+        vehicle.current_volume = 0
 
     print("All vehicles are on the start position.")
     app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
