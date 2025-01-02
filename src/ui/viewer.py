@@ -29,12 +29,13 @@ terrains = {
 }
 
 class Viewer:
-    def __init__(self, root, algorithm_callback, start_simulation_callback, restart_simulation_callback, endpoints_callback):
+    def __init__(self, root, algorithm_callback, start_simulation_callback, restart_simulation_callback, endpoints_callback, reposition_vehicles_callback):
         self.root = root
         self.algorithm_callback = algorithm_callback
         self.start_simulation_callback = start_simulation_callback
         self.restart_simulation_callback = restart_simulation_callback
         self.endpoints_callback = endpoints_callback
+        self.reposition_vehicles_callback = reposition_vehicles_callback
         self.selected_end_point_index = 0
 
         root.geometry("1200x600")
@@ -117,6 +118,8 @@ class Viewer:
 
         # Block Route
         menu.add_command(label="Block Route", command=self.block_route_ui)
+
+        menu.add_command(label="Reposition Vehicles", command=self.reposition_vehicles_callback)
 
     def restart_simulation(self):
         self.blocked_routes.clear()

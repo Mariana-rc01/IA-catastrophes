@@ -34,7 +34,8 @@ def main():
         algorithm_callback=lambda selected_algorithm, blocked_routes, selected_heuristic, selected_terrain: set_algorithm(selected_algorithm, blocked_routes, selected_heuristic, selected_terrain),
         start_simulation_callback=lambda: run_algorithm(state),
         restart_simulation_callback=lambda: restart_simulation(),
-        endpoints_callback=lambda: get_endpoints()
+        endpoints_callback=lambda: get_endpoints(),
+        reposition_vehicles_callback=lambda: reposition_vehicles_to_start()
     )
     app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
     app.run()
@@ -99,6 +100,17 @@ def restart_simulation():
     state = load_dataset("data/dataset1.json")
     print("Simulation restarted.")
     app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
+
+def reposition_vehicles_to_start():
+    global state
+    start_position = state.start_point.position
+
+    for vehicle in state.vehicles:
+        vehicle.position = start_position
+
+    print("All vehicles are on the start position.")
+    app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
+
 
 if __name__ == '__main__':
     main()
