@@ -17,13 +17,46 @@
             "current_weight": 0,
             "current_volume": 0,
             "status": "IDLE"
+        },
+        {
+            "id": 2,
+            "position": [-8.3969801, 41.5588274],
+            "type": {
+                "name": "Drone",
+                "transportation": 1,
+                "fuel_capacity": 100,
+                "weight_capacity": 50,
+                "volume_capacity": 50,
+                "average_velocity": 40
+            },
+            "current_fuel": 100,
+            "current_weight": 0,
+            "current_volume": 0,
+            "status": "IDLE"
+        },
+        {
+            "id": 3,
+            "position": [-8.3969801, 41.5588274],
+            "type": {
+                "name": "Barco",
+                "transportation": 2,
+                "fuel_capacity": 100,
+                "weight_capacity": 150,
+                "volume_capacity": 150,
+                "average_velocity": 60
+            },
+            "current_fuel": 100,
+            "current_weight": 0,
+            "current_volume": 0,
+            "status": "IDLE"
         }
     ],
     "start_point": {
         "position": [-8.3969801, 41.5588274],
         "supplies": [
             {"quantity": 50, "type": "Water"},
-            {"quantity": 50, "type": "Food"}
+            {"quantity": 50, "type": "Food"},
+            {"quantity": 50, "type": "Medicine"}
         ]
     },
     "end_points": [
@@ -31,7 +64,8 @@
             "position": [-8.3798922, 41.5684793],
             "needs_supplies": {
                 "Water": 7,
-                "Food": 4
+                "Food": 4,
+                "Medicine": 2
             },
             "priority": 1
         },
@@ -47,7 +81,8 @@
             "position": [-8.392092, 41.5691318],
             "needs_supplies": {
                 "Water": 3,
-                "Food": 2
+                "Food": 2,
+                "Medicine": 10
             },
             "priority": 1
         }

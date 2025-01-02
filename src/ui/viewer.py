@@ -53,9 +53,14 @@ class Viewer:
         start_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "start_position.png")
         self.original_start_point_image = Image.open(start_image_path)
 
-        # TODO: Add other vehicle images
-        vehicle_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "truck.png")
-        self.original_vehicle_image = Image.open(vehicle_image_path)
+        truck_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "truck.png")
+        self.original_truck_image = Image.open(truck_image_path)
+
+        boat_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "boat.png")
+        self.original_boat_image = Image.open(boat_image_path)
+
+        drone_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "drone.png")
+        self.original_drone_image = Image.open(drone_image_path)
 
         square_image_path = path.join(path.dirname(__file__), "..", "assets", "images", "square.png")
         self.original_square_image = Image.open(square_image_path)
@@ -223,8 +228,16 @@ class Viewer:
         i = 1
         for vehicle in vehicles:
             x, y = scale(vehicle.position.x + 0.0006 * i, vehicle.position.y)
-            vehicle_image = self.original_vehicle_image.resize((20, 20), Image.BILINEAR)
-            tk_vehicle_image = ImageTk.PhotoImage(vehicle_image)
+
+            if (vehicle.type.transportation == 0):
+                truck_image = self.original_truck_image.resize((20, 20), Image.BILINEAR)
+                tk_vehicle_image = ImageTk.PhotoImage(truck_image)
+            elif (vehicle.type.transportation == 1):
+                drone_image = self.original_drone_image.resize((25, 25), Image.BILINEAR)
+                tk_vehicle_image = ImageTk.PhotoImage(drone_image)
+            elif (vehicle.type.transportation == 2):
+                boat_image = self.original_boat_image.resize((20, 20), Image.BILINEAR)
+                tk_vehicle_image = ImageTk.PhotoImage(boat_image)
             self.images_on_canvas.append(tk_vehicle_image)
             vehicle_id = self.canvas.create_image(x, y, image=tk_vehicle_image, anchor=CENTER)
             i += 1
