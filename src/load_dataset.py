@@ -5,14 +5,16 @@ from graph.position import Position
 from start_point import StartPoint
 from supply import Supply, SupplyType
 from vehicle import Vehicle, VehicleStatus, VehicleType
+from weather import Weather, WeatherCondition
 
 class State:
-    def __init__(self, time, vehicles, start_point, end_points, graph):
+    def __init__(self, time, vehicles, start_point, end_points, graph, weather):
         self.time = time
         self.vehicles = vehicles
         self.start_point = start_point
         self.end_points = end_points
         self.graph = graph
+        self.weather = weather
 
 def load_dataset(dataset_path):
     with open(dataset_path, 'r') as file:
@@ -20,6 +22,10 @@ def load_dataset(dataset_path):
 
     geography = dataset['geography']
     graph = load_map_data_to_graph(geography)
+    weather = Weather()
+
+    for node in graph.nodes.values():    
+        weather.set_condition(Position(node.position.x, node.position.y), WeatherCondition.SUNNY)
 
     start_position = Position(*dataset['start_point']['position'])
     supplies = [Supply(s['quantity'], SupplyType[s['type']]) for s in dataset['start_point']['supplies']]
@@ -44,5 +50,5 @@ def load_dataset(dataset_path):
         )
         vehicles.append(vehicle)
 
-    return State(0, vehicles, start_point, end_points, graph)
+    return State(0, vehicles, start_point, end_points, graph, weather)
 

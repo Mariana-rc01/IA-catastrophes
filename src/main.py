@@ -33,9 +33,10 @@ def main():
         start_simulation_callback=lambda: run_algorithm(state),
         restart_simulation_callback=lambda: restart_simulation(),
         endpoints_callback=lambda: get_endpoints(),
-        reposition_vehicles_callback=lambda: reposition_vehicles_to_start()
+        reposition_vehicles_callback=lambda: reposition_vehicles_to_start(),
+        change_weather_callback=lambda node_id, weather_id: change_weather(node_id, weather_id)
     )
-    app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
+    app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles, state.weather)
     app.run()
 
 def set_algorithm(selected_algorithm, blocked_routes, selected_heuristic, selected_terrain):
@@ -66,12 +67,6 @@ def run_algorithm(state):
     selected_function = algorithm_functions.get(algorithm)
 
     if selected_function:
-        # Create the Weather object
-        weather = Weather()
-
-        # Set weather conditions
-        position = Position(-8.3969801, 41.5588274)
-        weather.set_condition(position, WeatherCondition.SUNNY)
 
         selected_end_point = state.end_points[app.selected_end_point_index]
 
@@ -81,7 +76,7 @@ def run_algorithm(state):
             state.start_point, 
             selected_end_point, 
             terrain, 
-            weather,
+            state.weather,
             app.blocked_routes  # Pass blocked routes here
         )
         if path:
@@ -90,14 +85,21 @@ def run_algorithm(state):
             print("No available path.")
 
         app.show_info_box(total_distance*100, total_time*60)
-    app.draw_path(state.graph, path, on_complete=lambda: app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles))
+    app.draw_path(state.graph, path, on_complete=lambda: app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles, state.weather))
 
 
 def restart_simulation():
     global state
     state = load_dataset("data/dataset1.json")
     print("Simulation restarted.")
-    app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
+    app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles, state.weather)
+
+def change_weather(node_id, weather_id):
+    global state
+    for node in state.graph.nodes.values():
+        if node.id == node_id:
+            state.weather.set_condition(Position(node.position.x, node.position.y), WeatherCondition.STORM)
+    app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles, state.weather)
 
 def reposition_vehicles_to_start():
     global state
@@ -110,7 +112,7 @@ def reposition_vehicles_to_start():
         vehicle.current_volume = 0
 
     print("All vehicles are on the start position.")
-    app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles)
+    app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles, state.weather)
 
 
 if __name__ == '__main__':
