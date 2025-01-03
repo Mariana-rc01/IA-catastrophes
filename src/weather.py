@@ -17,4 +17,4 @@ class Weather:
         return self.conditions.get(position)
     
     def blocked_position(self, position):
-        self.conditions[position] = WeatherCondition.STORM   
+        return self.conditions[position] == WeatherCondition.STORM

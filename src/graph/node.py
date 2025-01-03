@@ -1,4 +1,5 @@
 import weather
+from graph.position import Position
 
 class Node:
     def __init__(self, position, id):
@@ -8,4 +9,4 @@ class Node:
         self.accessible_terrains = [0,1,2] # List of Terrain
 
     def can_access_terrain(self, terrain, weather):
-        return terrain in self.accessible_terrains and not weather.blocked_position(self.position)
+        return terrain in self.accessible_terrains and not weather.blocked_position(Position(self.position.x, self.position.y))

@@ -91,14 +91,17 @@ class Viewer:
         algorithm_menu = Menu(menu, tearoff=0)
         for algo_key, algo_name in algorithms.items():
             algorithm_menu.add_command(label=algo_name, command=lambda key=algo_key: self.select_algorithm(key))
-
+        
         menu.add_cascade(label=f"⚙️ Algorithm: {self.selected_algorithm.upper()}", menu=algorithm_menu)
         self.root.config(menu=menu)
+        
+        # Restart simulation
+        menu.add_command(label="↺ Restart", command=self.restart_simulation)
 
         heuristic_menu = Menu(menu, tearoff=0)
         for heuristic_key, heuristic_name in heuristics.items():
             heuristic_menu.add_command(label=heuristic_name, command=lambda key=heuristic_key: self.select_heuristic(key))
-        menu.add_cascade(label=f"Heuristic: {self.selected_heuristic}", menu=heuristic_menu)
+        menu.add_cascade(label=f"★ Heuristic: {self.selected_heuristic}", menu=heuristic_menu)
 
         end_point_menu = Menu(menu, tearoff=0)
         end_points = self.endpoints_callback()
@@ -107,7 +110,7 @@ class Viewer:
                 label=f"End Point {idx+1}",
                 command=lambda idx=idx: self.select_end_point(idx),
             )
-        menu.add_cascade(label="Select End Point", menu=end_point_menu)
+        menu.add_cascade(label="☑ Select End Point", menu=end_point_menu)
 
         terrain_menu = Menu(menu, tearoff=0)
         for terrain_key, terrain_name in terrains.items():
@@ -115,18 +118,15 @@ class Viewer:
                 label=terrain_name,
                 command=lambda key=terrain_key: self.select_terrain(key)
             )
-        menu.add_cascade(label=f"terrain: {self.selected_terrain}", menu=terrain_menu)
-
-        # Restart simulation
-        menu.add_command(label="↺ Restart", command=self.restart_simulation)
+        menu.add_cascade(label=f"♒ Terrain: {self.selected_terrain}", menu=terrain_menu)
 
         # Block Route
-        menu.add_command(label="Block Route", command=self.block_route_ui)
+        menu.add_command(label="● Block Route", command=self.block_route_ui)
 
-        menu.add_command(label="Reposition Vehicles", command=self.reposition_vehicles_callback)
+        menu.add_command(label="☸ Reposition Vehicles", command=self.reposition_vehicles_callback)
 
         # Weather
-        menu.add_command(label="Weather", command=self.weather_ui)
+        menu.add_command(label="☀ Weather", command=self.weather_ui)
 
     def restart_simulation(self):
         self.blocked_routes.clear()
@@ -156,23 +156,19 @@ class Viewer:
         weather_window = Toplevel(self.root)
         weather_window.title("Weather")
 
-        Label(weather_window, text="0 | SUNNY", fg="gold").pack(pady=5)
-        Label(weather_window, text="1 | RAINY", fg="navy").pack(pady=5)
-        Label(weather_window, text="2 | SNOWY", fg="light sky blue").pack(pady=5)
-        Label(weather_window, text="3 | STORM", fg="dark violet").pack(pady=5)
+        Label(weather_window, text="0 | Sunny ☀", fg="gold").pack(pady=5)
+        Label(weather_window, text="1 | Rainy ☂", fg="navy").pack(pady=5)
+        Label(weather_window, text="2 | Snowy ☃", fg="light sky blue").pack(pady=5)
+        Label(weather_window, text="3 | Storm ⚡", fg="dark violet").pack(pady=5)
         
-        Label(weather_window, text="Enter the node and its updated weather (format: node,weatherNumber):").pack(pady=5)
-        node_weather_var = StringVar()
-        Entry(weather_window, textvariable=node_weather_var).pack(pady=5)
+        Label(weather_window, text="Enter the node and its updated weather number:").pack(pady=5)
+        node_id_var = StringVar()
+        Entry(weather_window, textvariable=node_id_var).pack(pady=5)
+        weather_id_var = StringVar()
+        Entry(weather_window, textvariable=weather_id_var).pack(pady=5)
         
         def confirm_node_weather_alteration():
-            node_weather = node_weather_var.get()
-            if "," in node_weather:
-                node = node_weather.split(",")[0]
-                condition = node_weather.split(",")[1]
-                self.change_weather_callback(node, condition)
-            else:
-                print("Invalid node + weather format. Please use 'node,weatherNumber'.")
+            self.change_weather_callback(node_id_var.get(), weather_id_var.get())
             weather_window.destroy()
         
         Button(weather_window, text="Confirm", command=confirm_node_weather_alteration).pack(pady=5)
@@ -250,7 +246,11 @@ class Viewer:
                 self.canvas.create_oval(x - 5, y - 5, x + 5, y + 5, fill="gold")
 
             x, y = scale(node.position.x, node.position.y)
-            self.canvas.create_oval(x - 3, y - 3, x + 3, y + 3, fill="blue")
+            node_id = self.canvas.create_oval(x - 3, y - 3, x + 3, y + 3, fill="blue")
+
+            # Bind tooltip to the graphical edge ID
+            self.canvas.tag_bind(node_id, "<Enter>", lambda e, t="Node: "+str(node.id): self.show_tooltip(e, t))
+            self.canvas.tag_bind(node_id, "<Leave>", self.hide_tooltip)
 
         # Draw start point
         x, y = scale(start_point.position.x, start_point.position.y)

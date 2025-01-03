@@ -97,8 +97,8 @@ def restart_simulation():
 def change_weather(node_id, weather_id):
     global state
     for node in state.graph.nodes.values():
-        if node.id == node_id:
-            state.weather.set_condition(Position(node.position.x, node.position.y), WeatherCondition.STORM)
+        if node.id == int(node_id):
+            state.weather.set_condition(Position(node.position.x, node.position.y), list(WeatherCondition)[int(weather_id)])
     app.display_graph(state.graph, state.start_point, state.end_points, state.vehicles, state.weather)
 
 def reposition_vehicles_to_start():
