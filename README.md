@@ -1,5 +1,7 @@
 # Inteligência Artificial 🧠
 
+## Grade: 19/20 :star:
+
 ## 🛠️ Usage
 
 To run the application:
